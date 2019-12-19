@@ -1,0 +1,22 @@
+{
+    "name": "kickpeach/kickpeach-s",
+    "description": "a tiny mvc framework based on swoole",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "shisiying",
+            "email": "shisiying@xhzyxed.cn"
+        }
+    ],
+    "require": {
+        "php": ">=7.1",
+        "ext-swoole": ">=4.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "KickPeachs\\": "framework/src"
+        }
+    }
+}
