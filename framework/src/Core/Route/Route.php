@@ -12,5 +12,42 @@ namespace KickPeachs\Core\Route;
 
 class Route
 {
+    private static $route = [];
+    private static $instance;
 
+    private function __construct()
+    {
+    }
+
+    public static function getInstance()
+    {
+        if (is_null(self::$instance)) {
+            self::$instance =  new self();
+        }
+
+        return self::$instance;
+    }
+
+    public static function addRoute(string $method, array $routeInfo)
+    {
+        self::$route[$method] = $routeInfo;
+    }
+
+    public static function dispatch($method,$pathInfo)
+    {
+        switch ($method) {
+            case 'GET':
+                foreach (self::$route[$method] as $v) {
+                    if ($pathInfo == $v['routePath']) {
+                        $handle = explode("@", $v['handle']);
+                        $class = $handle[0];
+                        $method = $handle[1];
+                        return (new $class)->$method();
+                    }
+                }
+                break;
+
+        }
+
+    }
 }

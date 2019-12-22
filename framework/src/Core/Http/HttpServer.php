@@ -24,17 +24,34 @@ class HttpServer
         BeanFactory::get('Config')->load();
         $config = BeanFactory::get('Config')->get("http");
         $this->httpServer = new Swoole\Http\Server($config['host'], $config['port']);
-        $this->httpServer->on('start',[$this,'start']);
-        $this->httpServer->on('workerStart',[$this,'workerStart']);
-        $this->httpServer->on('request',[$this,'request']);
+        $this->httpServer->set($config['setting']);
+        $this->httpServer->on('start', [$this, 'start']);
+        $this->httpServer->on('workerStart', [$this, 'workerStart']);
+        $this->httpServer->on('request', [$this, 'request']);
 
         $this->httpServer->start();
     }
 
     public function start()
     {
-        $config = BeanFactory::get('Config')->get("http");
+        $reload = BeanFactory::get('Reload');
+        $reload->watchDir = [CONFIG_PATH, APP_PATH, ROOT_PATH];
+        $reload->md5Value = $reload->getFilesMd5();
 
+        \Swoole\Timer::Tick(2000, function () use ($reload) {
+            if ($reload->checkReload()) {
+                $this->httpServer->reload();
+            }
+        });
+
+        $config = BeanFactory::get('Config')->get("http");
+        echo "***********************************************************************" . PHP_EOL;
+        echo sprintf("*HTTP     | Listen: %s:%d, type: TCP, worker: %d  ", $config['host'], $config['port'], $config['setting']['worker_num']) . PHP_EOL;
+        if (isset($config['rpcEnable']) && (int)$config['rpcEnable'] === 1) {
+            $config = BeanFactory::get('Config')->get("rpc");
+            echo sprintf("*RPC      | Listen: %s:%d, type: TCP, worker: %d  ", $config['host'], $config['port'], $config['setting']['worker_num']) . PHP_EOL;
+            echo "***********************************************************************" . PHP_EOL;
+        }
     }
 
 
@@ -44,12 +61,12 @@ class HttpServer
 
     }
 
-    public function request($request,$response)
+    public function request($request, $response)
     {
         $path_info = $request->server['path_info'];
         $method = $request->server['request_method'];
 
-        $response->end($path_info.$method);
+        $response->end($path_info . $method);
     }
 
     private function loadAnnotations()
@@ -61,7 +78,7 @@ class HttpServer
 
         foreach ($controllerFiles as $controllerFile) {
             $className = explode('.', end(explode('/', $controllerFile)))[0];
-            $fileContent = file_get_contents($controllerFile,false,null,0,500);
+            $fileContent = file_get_contents($controllerFile, false, null, 0, 500);
 
             preg_match('/namespace\s(.*)/i', $fileContent, $nameSpace);
             if (!isset($nameSpace[1])) {
@@ -69,7 +86,7 @@ class HttpServer
             }
 
             $nameSpace = str_replace([' ', ';', '"'], '', $nameSpace[1]);
-            $className = trim($nameSpace)."\\".$className;
+            $className = trim($nameSpace) . "\\" . $className;
 
             $obj = new $className;
             $reflectClass = new \ReflectionClass($obj);

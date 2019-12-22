@@ -20,8 +20,7 @@ class IndexController
      */
     public function index()
     {
-        echo "xxxx";
-        return "Admin";
+        return "Admin111";
     }
 
 }

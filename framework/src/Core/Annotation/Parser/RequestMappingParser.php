@@ -11,7 +11,7 @@ namespace KickPeachs\Core\Annotation\Parser;
 
 
 use KickPeachs\Core\Annotation\Mapping\RequestMapping;
-use KickPeachs\Core\Route\RouteRegister;
+use KickPeachs\Core\Bean\BeanFactory;
 
 class RequestMappingParser
 {
@@ -25,7 +25,7 @@ class RequestMappingParser
             'handle' => $annotaion->getHandle()
         ];
 
-        RouteRegister::addRoute($annotaion->getMethod(),$routeInfo);
+        BeanFactory::get('Route')->addRoute($annotaion->getMethod(),$routeInfo);
     }
 
 }

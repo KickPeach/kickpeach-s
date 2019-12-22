@@ -27,7 +27,7 @@ class RequestMapping
         $this->routePath = $prefix.'/'.$suffix;
         //todo 注解取得方法以及获得路由参数
         $this->method = "GET";
-        $this->handle = $reflect->getName()."@".$method->getName;
+        $this->handle = $reflect->getName()."@".$method->getName();
     }
 
     /**

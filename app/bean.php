@@ -9,5 +9,11 @@
 return [
     'Config'=>function(){
         return  \KickPeachs\Core\Config\Config::getInstance();
+    },
+    'Route'=>function(){
+        return  \KickPeachs\Core\Route\Route::getInstance();
+    },
+    'Reload'=>function(){
+        return \KickPeachs\Core\Reload\Reload::getInstance();
     }
 ];
