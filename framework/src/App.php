@@ -9,6 +9,7 @@
 
 namespace KickPeachs;
 
+use KickPeachs\Core\Bean\BeanFactory;
 use KickPeachs\Core\Http\HttpServer;
 use KickPeachs\Core\Rpc\Rpc;
 
@@ -27,16 +28,21 @@ class App
                 (new Rpc())->run();
                 break;
             default:
-                echo "未知参数，感谢您的使用！".PHP_EOL;
+                echo "未知参数，感谢您的使用！" . PHP_EOL;
                 break;
         }
     }
 
     private function init()
     {
-        define('ROOT_PATH',dirname(dirname(__DIR__)));
-        define('APP_PATH',ROOT_PATH.'/app');
-        define('CONFIG_PATH',ROOT_PATH.'/config');
+        define('ROOT_PATH', dirname(dirname(__DIR__)));
+        define('APP_PATH', ROOT_PATH . '/app');
+        define('CONFIG_PATH', ROOT_PATH . '/Config');
+
+        $bean = require APP_PATH . '/bean.php';
+        foreach ($bean as $name => $instance) {
+            BeanFactory::set($name, $instance);
+        }
     }
 
 }

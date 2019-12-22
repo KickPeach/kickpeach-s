@@ -11,6 +11,7 @@ namespace KickPeachs\Core\Http;
 
 use KickPeachs\Core\Annotation\Mapping\RequestMapping;
 use KickPeachs\Core\Annotation\Parser\RequestMappingParser;
+use KickPeachs\Core\Bean\BeanFactory;
 use Swoole;
 
 class HttpServer
@@ -20,8 +21,9 @@ class HttpServer
 
     public function run()
     {
-        //需要加载配置文件
-        $this->httpServer = new Swoole\Http\Server("0.0.0.0", 9080);
+        BeanFactory::get('Config')->load();
+        $config = BeanFactory::get('Config')->get("http");
+        $this->httpServer = new Swoole\Http\Server($config['host'], $config['port']);
         $this->httpServer->on('start',[$this,'start']);
         $this->httpServer->on('workerStart',[$this,'workerStart']);
         $this->httpServer->on('request',[$this,'request']);
@@ -31,6 +33,7 @@ class HttpServer
 
     public function start()
     {
+        $config = BeanFactory::get('Config')->get("http");
 
     }
 
